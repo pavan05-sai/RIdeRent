@@ -15,10 +15,12 @@ import com.vehiclerental.exception.ConflictException;
 import com.vehiclerental.exception.ResourceNotFoundException;
 import com.vehiclerental.repository.*;
 import com.vehiclerental.service.VehicleService;
+import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -57,19 +59,44 @@ public class VehicleServiceImpl implements VehicleService {
         Sort sort = sortDirection.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
         Pageable pageable = PageRequest.of(page, size, sort);
 
-        Page<Vehicle> vehiclePage = vehicleRepository.findVehiclesWithFilters(
-                (search != null && !search.isBlank()) ? search.trim() : null,
-                vehicleType,
-                (fuelType != null && !fuelType.isBlank()) ? fuelType.trim() : null,
-                (transmission != null && !transmission.isBlank()) ? transmission.trim() : null,
-                (location != null && !location.isBlank()) ? location.trim() : null,
-                minPrice,
-                maxPrice,
-                seats,
-                status,
-                pageable
-        );
+        Specification<Vehicle> spec = (root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            if (search != null && !search.isBlank()) {
+                String searchPattern = "%" + search.trim().toLowerCase() + "%";
+                predicates.add(cb.or(
+                    cb.like(cb.lower(root.get("brand")), searchPattern),
+                    cb.like(cb.lower(root.get("model")), searchPattern),
+                    cb.like(cb.lower(root.get("location")), searchPattern)
+                ));
+            }
+            if (vehicleType != null) {
+                predicates.add(cb.equal(root.get("vehicleType"), vehicleType));
+            }
+            if (fuelType != null && !fuelType.isBlank()) {
+                predicates.add(cb.equal(cb.lower(root.get("fuelType")), fuelType.trim().toLowerCase()));
+            }
+            if (transmission != null && !transmission.isBlank()) {
+                predicates.add(cb.equal(cb.lower(root.get("transmission")), transmission.trim().toLowerCase()));
+            }
+            if (location != null && !location.isBlank()) {
+                predicates.add(cb.like(cb.lower(root.get("location")), "%" + location.trim().toLowerCase() + "%"));
+            }
+            if (minPrice != null) {
+                predicates.add(cb.greaterThanOrEqualTo(root.get("pricePerDay"), minPrice));
+            }
+            if (maxPrice != null) {
+                predicates.add(cb.lessThanOrEqualTo(root.get("pricePerDay"), maxPrice));
+            }
+            if (seats != null) {
+                predicates.add(cb.equal(root.get("seatingCapacity"), seats));
+            }
+            if (status != null) {
+                predicates.add(cb.equal(root.get("status"), status));
+            }
+            return cb.and(predicates.toArray(new Predicate[0]));
+        };
 
+        Page<Vehicle> vehiclePage = vehicleRepository.findAll(spec, pageable);
         return vehiclePage.map(this::mapToVehicleResponse);
     }
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { 
   Calendar, Clock, ShieldCheck, Tag, CreditCard, CheckCircle, 
   MapPin, AlertCircle, FileText, ChevronRight, X, Heart, Star, Bell
@@ -382,8 +382,13 @@ export const UserDashboard: React.FC<UserDashboardProps> = () => {
                     </div>
                   ))}
                   {bookings.length === 0 && (
-                    <div className="p-8 text-center text-gray-500 text-sm">
-                      No bookings yet. Browse vehicles to start your first trip.
+                    <div className="p-8 text-center text-gray-500 text-sm flex flex-col items-center justify-center space-y-3">
+                      <p>No bookings yet. Browse our available fleet to start your trip.</p>
+                      <Link to="/vehicles">
+                        <Button size="sm" variant="primary">
+                          Explore Available Vehicles
+                        </Button>
+                      </Link>
                     </div>
                   )}
                 </div>
@@ -535,7 +540,12 @@ export const UserDashboard: React.FC<UserDashboardProps> = () => {
                     {bookings.length === 0 && (
                       <tr>
                         <td colSpan={6} className="py-12 text-center text-gray-500">
-                          No bookings found. Head to the fleet catalog to book a ride!
+                          <p className="mb-3">No reservations found yet.</p>
+                          <Link to="/vehicles">
+                            <Button size="sm" variant="primary">
+                              Browse All Vehicles
+                            </Button>
+                          </Link>
                         </td>
                       </tr>
                     )}
