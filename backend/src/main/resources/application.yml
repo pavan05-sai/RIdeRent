@@ -66,20 +66,15 @@ spring:
 
 ---
 # PostgreSQL Profile: For Render managed PostgreSQL (free tier)
+# DataSource URL is parsed in PostgresDataSourceConfig.java (handles Render URI format)
 spring:
   config:
     activate:
       on-profile: postgres
-  datasource:
-    url: jdbc:${DATABASE_URL}
-    driverClassName: org.postgresql.Driver
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: update
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
 
 logging:
   level:
