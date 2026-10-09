@@ -71,7 +71,7 @@ spring:
     activate:
       on-profile: postgres
   datasource:
-    url: ${DATABASE_URL}
+    url: jdbc:${DATABASE_URL}
     driverClassName: org.postgresql.Driver
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
