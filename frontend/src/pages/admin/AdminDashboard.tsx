@@ -4,6 +4,7 @@ import {
   XCircle, Clock, Shield, Search, Plus, Edit, Trash2, Check, RefreshCw 
 } from 'lucide-react';
 import { adminService } from '../../services/adminService';
+import { vehicleService } from '../../services/vehicleService';
 import { useToast } from '../../context/ToastContext';
 import { 
   DashboardStats, DashboardAnalytics, Vehicle, Booking, User, 
@@ -94,11 +95,11 @@ export const AdminDashboard: React.FC = () => {
 
       // Load vehicles & bookings
       const [vRes, bRes] = await Promise.allSettled([
-        fetch('http://localhost:8085/api/vehicles?page=0&size=50').then((r) => r.json()),
+        vehicleService.getVehicles({ page: 0, size: 50 }),
         adminService.getBookings(undefined, undefined, 0, 50),
       ]);
-      if (vRes.status === 'fulfilled' && vRes.value?.data?.content) {
-        setVehicles(vRes.value.data.content);
+      if (vRes.status === 'fulfilled' && vRes.value?.content) {
+        setVehicles(vRes.value.content);
       }
       if (bRes.status === 'fulfilled') {
         setBookings(bRes.value.content || []);
@@ -937,6 +938,7 @@ export const AdminDashboard: React.FC = () => {
                   </label>
                   <input
                     type="text"
+                    required
                     value={vehicleForm.location}
                     onChange={(e) => setVehicleForm({ ...vehicleForm, location: e.target.value })}
                     className="w-full p-2 border border-gray-300 rounded text-sm focus:border-black focus:outline-none"
