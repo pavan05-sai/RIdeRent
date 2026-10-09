@@ -63,3 +63,25 @@ spring:
     database-platform: org.hibernate.dialect.MySQLDialect
     hibernate:
       ddl-auto: update
+
+---
+# PostgreSQL Profile: For Render managed PostgreSQL (free tier)
+spring:
+  config:
+    activate:
+      on-profile: postgres
+  datasource:
+    url: ${DATABASE_URL}
+    driverClassName: org.postgresql.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+logging:
+  level:
+    org.springframework.security: WARN
+    com.vehiclerental: INFO
