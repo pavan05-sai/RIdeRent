@@ -1,0 +1,10 @@
+[phases.setup]
+nixPkgs = ["jdk21_headless", "maven"]
+
+[phases.build]
+cmds = [
+  "cd backend && mvn clean package -DskipTests"
+]
+
+[start]
+cmd = "java -jar backend/target/vehicle-rental-system-1.0.0.jar"
